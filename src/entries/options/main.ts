@@ -11,7 +11,7 @@ const imageUrl = new URL(logo, import.meta.url).href;
 document.querySelector('#app')!.innerHTML = `
   <img src="${imageUrl}" height="45" alt="" />
   <label>
-    <input type="checkbox" id="toggleExtensionOption" /> Enable Extension
+    <input type="checkbox" id="toggleExtensionOption" /> Enable Fix
   </label>
 `;
 

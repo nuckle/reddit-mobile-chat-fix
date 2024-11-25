@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { getAppDomain, getUserAgent } from '~/utils';
+import { getAppDomain, getUserAgent, isEnabled } from '../../entries/utils';
 
 const domain = getAppDomain();
 
@@ -20,46 +20,69 @@ browser.runtime.onInstalled.addListener(() => {
 
 const userAgent = getUserAgent();
 
-if (chrome.declarativeNetRequest) {
-	const rules = {
-		removeRuleIds: [1],
-		addRules: [
-			{
-				id: 1,
-				priority: 1,
-				action: {
-					type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
-					requestHeaders: [
+if (chrome?.declarativeNetRequest !== undefined) {
+	function updateRulesBasedOnEnabled() {
+		isEnabled(browser).then((enabled) => {
+			if (enabled) {
+				const rules = {
+					removeRuleIds: [1],
+					addRules: [
 						{
-							header: 'user-agent',
-							operation: chrome.declarativeNetRequest.HeaderOperation.SET,
-							value: userAgent,
+							id: 1,
+							priority: 1,
+							action: {
+								type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+								requestHeaders: [
+									{
+										header: 'user-agent',
+										operation: chrome.declarativeNetRequest.HeaderOperation.SET,
+										value: userAgent,
+									},
+								],
+							},
+							condition: {
+								resourceTypes: [chrome.declarativeNetRequest.ResourceType.MAIN_FRAME],
+								urlFilter: domain,
+							},
 						},
 					],
-				},
-				condition: {
-					resourceTypes: [chrome.declarativeNetRequest.ResourceType.MAIN_FRAME],
-					urlFilter: domain,
-				},
-			},
-		],
-	};
+				};
+
+				chrome.declarativeNetRequest.updateDynamicRules(rules);
+			} else {
+				chrome.declarativeNetRequest.updateDynamicRules({
+					removeRuleIds: [1],
+				});
+			}
+		});
+	}
 
 	chrome.runtime.onInstalled.addListener(function () {
-		chrome?.declarativeNetRequest.updateDynamicRules(rules);
+		updateRulesBasedOnEnabled();
+	});
+
+	chrome.storage.onChanged.addListener(function (changes, areaName) {
+		if (areaName === 'sync' && changes.hasOwnProperty('enabled')) {
+			updateRulesBasedOnEnabled();
+		}
 	});
 } else {
 	browser.webRequest.onBeforeSendHeaders.addListener(
 		function (info) {
-			const headers = info.requestHeaders;
-			if (headers) {
-				headers?.forEach(function (header) {
-					if (header.name.toLowerCase() == 'user-agent') {
-						header.value = userAgent;
+			return isEnabled(browser).then((enabled) => {
+				if (enabled) {
+					const headers = info.requestHeaders;
+					if (headers) {
+						headers.forEach(function (header) {
+							if (header.name.toLowerCase() === 'user-agent') {
+								header.value = userAgent;
+							}
+						});
 					}
-				});
-			}
-			return { requestHeaders: headers };
+					return { requestHeaders: headers };
+				}
+				return { requestHeaders: info.requestHeaders };
+			});
 		},
 		{
 			urls: [domain],

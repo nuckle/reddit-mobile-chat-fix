@@ -1,16 +1,12 @@
+import { isEnabled } from '~/entries/utils';
 import './style.css';
 import browser from 'webextension-polyfill';
 
-browser.storage.sync
-	.get('enabled')
-	.then((data) => {
-		if (data.enabled) {
-			injectScript();
-		}
-	})
-	.catch((error) => {
-		console.error('Error getting storage data:', error);
-	});
+isEnabled(browser).then((enabled) => {
+	if (enabled) {
+		injectScript();
+	}
+});
 
 function injectScript() {
 	if (!document.getElementById('injectedChatScript')) {
