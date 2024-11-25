@@ -194,7 +194,7 @@
 
 			// Exclude aria-label to not interact with button from Chat settings
 			const backBtn = shadow?.querySelector(
-				'header > button.button-small.button-plain.icon.inline-flex.text-tone-2.back-icon-display:not([aria-label])',
+				'main > header > button.button-small.button-plain.icon.inline-flex.text-tone-2.back-icon-display:not([aria-label])',
 			);
 
 			const settingsBtn = shadow?.querySelector(
@@ -221,7 +221,9 @@
 
 			// Avoid getting "stuck"
 			if (welcomeScreen) {
-				showChatWindow();
+				setTimeout(() => {
+					showChatWindow();
+				}, 300); 
 			}
 
 			// Fix scroll "jumping" when user is entering a message
