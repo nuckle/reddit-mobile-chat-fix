@@ -1,10 +1,13 @@
 import pkg from '../package.json';
+import { getAppDomain } from './utils';
+
+const domain = getAppDomain();
 
 const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
 	content_scripts: [
 		{
 			js: ['src/entries/contentScript/primary/main.ts'],
-			matches: ['*://chat.reddit.com/*'],
+			matches: [domain],
 			all_frames: true,
 			run_at: 'document_idle',
 		},
@@ -25,12 +28,7 @@ const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
 		page: 'src/entries/options/index.html',
 		open_in_tab: true,
 	},
-	permissions: [
-		'activeTab',
-		'storage',
-		'scripting',
-		'*://chat.reddit.com/*',
-	],
+	permissions: ['activeTab', 'storage', 'scripting', domain],
 	browser_specific_settings: {
 		gecko: {
 			id: 'addon@example.com',
@@ -66,7 +64,11 @@ const ManifestV2 = {
 		...sharedManifest.options_ui,
 		chrome_style: false,
 	},
-	permissions: [...sharedManifest.permissions],
+	permissions: [
+		...sharedManifest.permissions,
+		'webRequest',
+		'webRequestBlocking',
+	],
 };
 
 const ManifestV3 = {
@@ -75,7 +77,8 @@ const ManifestV3 = {
 	background: {
 		service_worker: 'src/entries/background/serviceWorker.ts',
 	},
-	host_permissions: ['*://chat.reddit.com/*'],
+	host_permissions: [domain],
+	permissions: [...sharedManifest.permissions, 'declarativeNetRequest'],
 };
 
 export function getManifest(
