@@ -3,6 +3,7 @@
 
 	const shadowRoots = new Set();
 	const styles = new Map();
+	const listeners = new WeakMap();
 
 	const originalAttachShadow = Element.prototype.attachShadow;
 
@@ -26,19 +27,50 @@
 		)
 			return;
 
-		const eventListener = (e) => {
-			callback(e);
-		};
+		const boundCallback = callback.bind(element);
 
-		element.removeEventListener(eventType, eventListener);
+		// Cleanup any duplicate listeners
+		element.removeEventListener(eventType, boundCallback);
+		element.addEventListener(eventType, boundCallback);
 
-		element.addEventListener(eventType, eventListener);
+		// Track the listener for later removal
+		if (!listeners.has(element)) {
+			listeners.set(element, []);
+		}
+		listeners.get(element).push({ eventType, boundCallback });
+	}
+
+	function cleanUpElement(element) {
+		if (listeners.has(element)) {
+			const elementListeners = listeners.get(element);
+			elementListeners.forEach(({ eventType, boundCallback }) => {
+				element.removeEventListener(eventType, boundCallback);
+			});
+			listeners.delete(element);
+		}
+
+		if (styles.has(element)) {
+			const styleElement = styles.get(element);
+			if (styleElement.parentNode) {
+				styleElement.parentNode.removeChild(styleElement);
+			}
+			styles.delete(element);
+		}
+
+		if (shadowRoots.has(element)) {
+			shadowRoots.delete(element);
+		}
 	}
 
 	function adjustTextareaHeight(textarea) {
 		setTimeout(function () {
 			textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
 		}, 1);
+	}
+
+	function updateTextareaHeight(textarea) {
+		textarea.style.height = 'auto';
+		textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
 	}
 
 	function createCustomDesktopStyleClass(shadow, className, styles) {
@@ -158,10 +190,13 @@
 				'rs-textarea-auto-size textarea',
 			);
 
-			const chatRoomLink = shadow?.querySelector('rs-rooms-nav-room');
+			const chatRoomLinks = shadow?.querySelectorAll('rs-rooms-nav-room');
+
+			// Exclude aria-label to not interact with button from Chat settings
 			const backBtn = shadow?.querySelector(
-				'header > button.button-small.button-plain.icon.inline-flex.text-tone-2',
+				'header > button.button-small.button-plain.icon.inline-flex.text-tone-2.back-icon-display:not([aria-label])',
 			);
+
 			const settingsBtn = shadow?.querySelector(
 				'button.text-tone-2.button-small.button-plain.button.inline-flex[aria-label="Open chat settings"]',
 			);
@@ -173,10 +208,21 @@
 			).find((btn) => btn.textContent.trim() === 'Cancel');
 
 			const btnElements = shadow?.querySelectorAll(
-				'li.relative.list-none.mt-0[role="presentation"]',
+				'div.border-solid > div.flex > li.relative.list-none.mt-0[role="presentation"]',
 			);
 			const requestBtn = btnElements[0];
 			const threadsBtn = btnElements[1] || btnElements[0];
+
+			const startChatBtn = shadow?.querySelector(
+				'form div.buttons button.button-primary[type="submit"]',
+			);
+
+			const welcomeScreen = container?.querySelector('rs-welcome-screen');
+
+			// Avoid getting "stuck"
+			if (welcomeScreen) {
+				showChatWindow();
+			}
 
 			// Fix scroll "jumping" when user is entering a message
 			if (composerTextArea) {
@@ -185,7 +231,12 @@
 					e.stopImmediatePropagation();
 					adjustTextareaHeight(composerTextArea);
 				};
+
+				const focusoutCallback = () => {
+					updateTextareaHeight(composerTextArea);
+				};
 				updateEventListener(composerTextArea, 'input', inputCallback);
+				updateEventListener(composerTextArea, 'focusout', focusoutCallback);
 			}
 
 			// Initialize the main container if not already set
@@ -229,14 +280,14 @@
 				createToggleButton(existingBtnContainer);
 			}
 
-			// Add event listener to chat room link
 			if (
-				chatRoomLink ||
+				chatRoomLinks.length > 0 ||
 				backBtn ||
 				settingsBtn ||
 				threadsBtn ||
 				requestBtn ||
 				createChatBtn ||
+				startChatBtn ||
 				cancelBtn
 			) {
 				function handleButtonClick(element, eventType, callback) {
@@ -250,14 +301,40 @@
 
 				handleButtonClick(cancelBtn, 'click', showCallback);
 				handleButtonClick(createChatBtn, 'click', hideCallback);
-				handleButtonClick(chatRoomLink, 'click', hideCallback);
 				handleButtonClick(settingsBtn, 'click', hideCallback);
 				handleButtonClick(backBtn, 'click', showCallback);
 				handleButtonClick(requestBtn, 'click', showCallback);
 				handleButtonClick(threadsBtn, 'click', hideCallback);
+				handleButtonClick(startChatBtn, 'click', hideCallback);
+
+				chatRoomLinks?.forEach((chatRoomLink) => {
+					handleButtonClick(chatRoomLink, 'click', hideCallback);
+				});
 			}
 		});
 	}
+
+	const observer = new MutationObserver((mutations) => {
+		mutations.forEach((mutation) => {
+			mutation.removedNodes.forEach((node) => {
+				if (node instanceof Element) {
+					if (shadowRoots.has(node)) {
+						cleanUpElement(node);
+					}
+
+					const shadowRootDescendants = Array.from(
+						node.querySelectorAll('*'),
+					).filter((descendant) => shadowRoots.has(descendant));
+					shadowRootDescendants.forEach(cleanUpElement);
+				}
+			});
+		});
+	});
+
+	observer.observe(document.body, {
+		childList: true,
+		subtree: true,
+	});
 
 	window.Element.prototype.attachShadowOri =
 		window.Element.prototype.attachShadow;
