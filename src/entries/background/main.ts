@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { getAppDomain } from '~/utils';
+import { getAppDomain, getUserAgent } from '~/utils';
 
 const domain = getAppDomain();
 
@@ -18,8 +18,7 @@ browser.runtime.onInstalled.addListener(() => {
 		});
 });
 
-const userAgent =
-	'Mozilla/5.0 (Linux; Android 10; RMX2151) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.86 Mobile Safari/537.36';
+const userAgent = getUserAgent();
 
 if (chrome.declarativeNetRequest) {
 	const rules = {
