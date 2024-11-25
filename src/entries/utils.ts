@@ -5,7 +5,7 @@ export const getAppDomain = (): string => {
 };
 
 export const getUserAgent = (): string => {
-	return 'Mozilla/5.0 (Linux; Android 10; RMX2151) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.86 Mobile Safari/537.36';
+	return 'Mozilla/5.0 (Windows NT 6.1; rv:68.0) Gecko/20100101 Goanna/4.7 Firefox/68.0 PaleMoon/28.17.0';
 };
 
 export function isEnabled(browser: Browser) {
