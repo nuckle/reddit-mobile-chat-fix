@@ -18,7 +18,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "types": ["web-ext-types", "webextension-polyfill", "chrome"]
+    "types": ["webextension-polyfill", "chrome"]
   },
   "include": ["src"]
 }
