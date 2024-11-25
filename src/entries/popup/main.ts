@@ -1,6 +1,6 @@
+import browser from 'webextension-polyfill';
 import logo from '~/assets/logo.svg';
 import './style.css';
-import browser from 'webextension-polyfill';
 
 const imageUrl = new URL(logo, import.meta.url).href;
 
@@ -11,7 +11,7 @@ interface StorageData {
 document.querySelector('#app')!.innerHTML = `
   <img src="${imageUrl}" height="45" alt="" />
   <label>
-    <input type="checkbox" id="toggleExtension" /> Enable Extension
+    Enable Fix <input type="checkbox" id="toggleExtension" />
   </label>
 `;
 
