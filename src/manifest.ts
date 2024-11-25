@@ -1,5 +1,5 @@
 import pkg from '../package.json';
-import { getAppDomain } from './utils';
+import { getAppDomain } from './entries/utils';
 
 const domain = getAppDomain();
 
@@ -28,7 +28,7 @@ const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
 		page: 'src/entries/options/index.html',
 		open_in_tab: true,
 	},
-	permissions: ['activeTab', 'storage', 'scripting'],
+	permissions: ['storage', 'scripting'],
 	browser_specific_settings: {
 		gecko: {
 			id: 'addon@example.com',
@@ -63,6 +63,7 @@ const ManifestV2 = {
 		...sharedManifest.permissions,
 		'webRequest',
 		'webRequestBlocking',
+		domain,
 	],
 };
 
