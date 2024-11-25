@@ -1,7 +1,12 @@
 import pkg from '../package.json';
 import { getAppDomain } from './entries/utils';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const domain = getAppDomain();
+
+const isFirefox = process.env?.FIREFOX_BUILD === '1' ? true : false;
 
 const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
 	content_scripts: [
@@ -29,12 +34,14 @@ const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
 		open_in_tab: true,
 	},
 	permissions: ['storage', 'scripting'],
-	browser_specific_settings: {
-		gecko: {
-			id: 'addon@example.com',
-			strict_min_version: '58.0',
+	...(isFirefox && {
+		browser_specific_settings: {
+			gecko: {
+				id: 'addon@example.com',
+				strict_min_version: '89',
+			},
 		},
-	},
+	}),
 };
 
 const browserAction = {

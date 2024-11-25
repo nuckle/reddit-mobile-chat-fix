@@ -4,7 +4,7 @@ import path from 'path';
 import { getManifest } from './src/manifest';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
 
 	return {
