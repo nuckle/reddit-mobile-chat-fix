@@ -2,7 +2,6 @@
 	'use strict';
 
 	const shadowRoots = new Set();
-	const styles = new Map();
 	const listeners = new WeakMap();
 
 	const originalAttachShadow = Element.prototype.attachShadow;
@@ -10,14 +9,30 @@
 	Element.prototype.attachShadow = function () {
 		const shadowRoot = originalAttachShadow.apply(this, arguments);
 
-		styles.forEach((style) => {
-			const clonedStyle = style.cloneNode(true);
-			shadowRoot.appendChild(clonedStyle);
+		// Remove duplicates
+		let isDeleted = false;
+		shadowRoots.forEach((shadowRootSet) => {
+			if (
+				shadowRootSet.host.outerHTML === shadowRoot.host.outerHTML ||
+				shadowRootSet.host.nodeName === shadowRoot.host.nodeName
+			) {
+				shadowRoots.delete(shadowRootSet);
+				isDeleted = true;
+			}
 		});
 
-		shadowRoots.add(shadowRoot);
+		if (!isDeleted) shadowRoots.add(shadowRoot);
+
 		return shadowRoot;
 	};
+
+	function debounce(func, delay) {
+		let timer;
+		return function (...args) {
+			clearTimeout(timer);
+			timer = setTimeout(() => func(...args), delay);
+		};
+	}
 
 	function updateEventListener(element, eventType, callback) {
 		if (
@@ -29,6 +44,18 @@
 
 		const boundCallback = callback.bind(element);
 
+		if (listeners.has(element)) {
+			const existingListeners = listeners.get(element);
+			if (
+				existingListeners.some(
+					(listener) => listener.callback.toString() === callback.toString(),
+				)
+			) {
+				// Listener already registered.
+				return;
+			}
+		}
+
 		// Cleanup any duplicate listeners
 		element.removeEventListener(eventType, boundCallback);
 		element.addEventListener(eventType, boundCallback);
@@ -37,29 +64,7 @@
 		if (!listeners.has(element)) {
 			listeners.set(element, []);
 		}
-		listeners.get(element).push({ eventType, boundCallback });
-	}
-
-	function cleanUpElement(element) {
-		if (listeners.has(element)) {
-			const elementListeners = listeners.get(element);
-			elementListeners.forEach(({ eventType, boundCallback }) => {
-				element.removeEventListener(eventType, boundCallback);
-			});
-			listeners.delete(element);
-		}
-
-		if (styles.has(element)) {
-			const styleElement = styles.get(element);
-			if (styleElement.parentNode) {
-				styleElement.parentNode.removeChild(styleElement);
-			}
-			styles.delete(element);
-		}
-
-		if (shadowRoots.has(element)) {
-			shadowRoots.delete(element);
-		}
+		listeners.get(element).push({ eventType, callback });
 	}
 
 	function adjustTextareaHeight(textarea) {
@@ -182,6 +187,9 @@
 		};
 
 		shadowRoots.forEach((shadow) => {
+			if (!(shadow instanceof ShadowRoot)) {
+				return;
+			}
 			const header = shadow?.querySelector('main header.flex');
 			const container = shadow?.querySelector('div.container');
 			const createRoomBtn = shadow?.querySelector('rs-room-creation-button');
@@ -223,7 +231,7 @@
 			if (welcomeScreen) {
 				setTimeout(() => {
 					showChatWindow();
-				}, 300); 
+				}, 300);
 			}
 
 			// Fix scroll "jumping" when user is entering a message
@@ -231,7 +239,10 @@
 				composerTextArea.style.overflowY = 'auto';
 				const inputCallback = (e) => {
 					e.stopImmediatePropagation();
-					adjustTextareaHeight(composerTextArea);
+
+					debounce(() => {
+						adjustTextareaHeight(composerTextArea);
+					}, 150)();
 				};
 
 				const focusoutCallback = () => {
@@ -315,28 +326,6 @@
 			}
 		});
 	}
-
-	const observer = new MutationObserver((mutations) => {
-		mutations.forEach((mutation) => {
-			mutation.removedNodes.forEach((node) => {
-				if (node instanceof Element) {
-					if (shadowRoots.has(node)) {
-						cleanUpElement(node);
-					}
-
-					const shadowRootDescendants = Array.from(
-						node.querySelectorAll('*'),
-					).filter((descendant) => shadowRoots.has(descendant));
-					shadowRootDescendants.forEach(cleanUpElement);
-				}
-			});
-		});
-	});
-
-	observer.observe(document.body, {
-		childList: true,
-		subtree: true,
-	});
 
 	window.Element.prototype.attachShadowOri =
 		window.Element.prototype.attachShadow;
