@@ -14,7 +14,6 @@
 		"serve:firefox": "web-ext run --start-url \"about:debugging#/runtime/this-firefox\"  --source-dir ./dist/",
 		"serve:chrome": "web-ext run -t chromium --start-url \"https://example.com\" --source-dir ./dist/"
 	},
-	"license": "MIT",
 	"devDependencies": {
 		"@samrum/vite-plugin-web-extension": "^5.0.0",
 		"@types/chrome": "^0.0.254",
