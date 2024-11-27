@@ -20,13 +20,12 @@ on mobile!
   <img src="img/3.png" alt="With the extension">
 </details>
 
-## Features 
+## Features
 
 - DMs support
 - Threads support
 - Built-in user-agent spoofer
 - Basic chat functionality support
- 
 
 ## Usage Notes
 
@@ -93,7 +92,8 @@ npm run build:firefox
 The build will be at `dist/` directory
 
 **Note:** Chrome build will use `v3` manifest and Firefox build will use `v2`
-manifest
+manifest. Also I added a random id for Firefox build to be able to install it
+without any additional steps.
 
 ### Load extension in browser
 
