@@ -119,3 +119,4 @@ npm run serve:firefox
 ## License
 
 This project uses AGPL license: [License](LICENSE)
+
