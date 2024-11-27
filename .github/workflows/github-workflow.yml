@@ -30,24 +30,13 @@ jobs:
           cache: 'npm'
       - name: Install Dependencies
         run: npm install
+
       - name: Build ${{ env.APP_NAME }} for Firefox
         run: npm run build:firefox
 
-      - name: Create .zip for Firefox build
-        uses: thedoctor0/zip-release@0.7.5
-        with:
-          type: 'zip'
-          filename: 'firefox.zip'
-          path: 'dist/'
       - name: Build ${{ env.APP_NAME }} for Chrome
         run: npm run build:chrome
 
-      - name: Create .zip for Chrome build
-        uses: thedoctor0/zip-release@0.7.5
-        with:
-          type: 'zip'
-          filename: 'chrome.zip'
-          path: 'dist/'
 
   changelog:
     name: Changelog
@@ -81,7 +70,7 @@ jobs:
           git-branch: ${{ env.PR_BRANCH }}
           skip-git-pull: true
           output-file: false
-          version-file: .github/package.yaml
+          version-file: package.json
           create-summary: true
 
       - name: Create Changelog PR
@@ -112,11 +101,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build ${{ env.APP_NAME }} for Firefox
+        run: npm run build:firefox
+      - name: Create .zip for Firefox build
+        uses: thedoctor0/zip-release@0.7.5
+        with:
+          type: 'zip'
+          filename: 'firefox.zip'
+          path: 'dist/'
+
+      - name: Build ${{ env.APP_NAME }} for Chrome
+        run: npm run build:chrome
+      - name: Create .zip for Chrome build
+        uses: thedoctor0/zip-release@0.7.5
+        with:
+          type: 'zip'
+          filename: 'chrome.zip'
+          path: 'dist/'
+
       - name: Upload Release
         uses: ncipollo/release-action@v1.12.0
         with:
           artifacts: "firefox.zip,chrome.zip"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_OWNER_TOKEN }}
           generateReleaseNotes: true
           draft: false
           prerelease: false
@@ -128,4 +145,3 @@ jobs:
 
             ${{ needs.changelog.outputs.clean_changelog }}
             </details>
-
