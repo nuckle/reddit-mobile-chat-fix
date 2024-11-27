@@ -30,24 +30,24 @@ jobs:
           cache: 'npm'
       - name: Install Dependencies
         run: npm install
+
       - name: Build ${{ env.APP_NAME }} for Firefox
         run: npm run build:firefox
+      # - name: Create .zip for Firefox build
+      #   uses: thedoctor0/zip-release@0.7.5
+      #   with:
+      #     type: 'zip'
+      #     filename: 'firefox.zip'
+      #     path: 'dist/'
 
-      - name: Create .zip for Firefox build
-        uses: thedoctor0/zip-release@0.7.5
-        with:
-          type: 'zip'
-          filename: 'firefox.zip'
-          path: 'dist/'
       - name: Build ${{ env.APP_NAME }} for Chrome
         run: npm run build:chrome
-
-      - name: Create .zip for Chrome build
-        uses: thedoctor0/zip-release@0.7.5
-        with:
-          type: 'zip'
-          filename: 'chrome.zip'
-          path: 'dist/'
+      # - name: Create .zip for Chrome build
+      #   uses: thedoctor0/zip-release@0.7.5
+      #   with:
+      #     type: 'zip'
+      #     filename: 'chrome.zip'
+      #     path: 'dist/'
 
   changelog:
     name: Changelog
