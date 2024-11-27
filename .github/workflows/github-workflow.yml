@@ -145,4 +145,3 @@ jobs:
 
             ${{ needs.changelog.outputs.clean_changelog }}
             </details>
-
