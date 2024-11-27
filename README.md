@@ -57,7 +57,7 @@ MANIFEST_VERSION=3
 FIREFOX_BUILD=0
 ```
 - `MANIFEST_VERSION` - manifest version you want to use (`2` or `3`)
-- `FIREFOX_BUILD` - if the build meant for Firefox (`0` - no, `1` - yes)
+- `FIREFOX_BUILD` - is the build for Firefox (`0` - no, `1` - yes)
 
 ## Commands
 
