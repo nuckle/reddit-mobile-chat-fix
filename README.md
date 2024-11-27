@@ -20,6 +20,15 @@ on mobile!
   <img src="img/3.png" alt="With the extension">
 </details>
 
+## Download
+
+|Firefox|
+|---    |
+|<p align="center"><a href="https://addons.mozilla.org/en-US/firefox/addon/reddit-mobile-chat-fix/" ><img src="img/firefox.png"></a></p>|<p align="center">|
+|[Download](https://addons.mozilla.org/en-US/firefox/addon/reddit-mobile-chat-fix/)|
+
+Or on a [release page](https://github.com/nuckle/reddit-chat-mobile-fix/releases/latest)
+
 ## Features
 
 - DMs support
