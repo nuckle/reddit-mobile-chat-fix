@@ -11,10 +11,13 @@
 
 		// Remove duplicates
 		let isDeleted = false;
+
+		// Clean up
 		shadowRoots.forEach((shadowRootSet) => {
 			if (
-				shadowRootSet.host.outerHTML === shadowRoot.host.outerHTML ||
-				shadowRootSet.host.nodeName === shadowRoot.host.nodeName
+				shadowRootSet.host.innerHTML === shadowRoot.host.innerHTML &&
+				shadowRootSet.host.nodeName === shadowRoot.host.nodeName &&
+				shadowRootSet.host.dataset.changed !== 'true'
 			) {
 				shadowRoots.delete(shadowRootSet);
 				isDeleted = true;
@@ -128,6 +131,12 @@
 
 	let existingMainContainer = null;
 
+	// A function to track if shadowRoot was changed
+	// (we don't want to delete changed shadowRoots)
+	function setChanged(shadowRootHost) {
+		shadowRootHost.dataset.changed = true;
+	}
+
 	function applyStyles() {
 		const toggleChatWindow = () => {
 			if (existingMainContainer) {
@@ -236,6 +245,7 @@
 
 			// Fix scroll "jumping" when user is entering a message
 			if (composerTextArea) {
+				setChanged(shadow.host);
 				composerTextArea.style.overflowY = 'auto';
 				const inputCallback = (e) => {
 					e.stopImmediatePropagation();
@@ -254,6 +264,7 @@
 
 			// Initialize the main container if not already set
 			if (!existingMainContainer && container) {
+				setChanged(shadow.host);
 				existingMainContainer = container;
 				createCustomMobileStyleClass(
 					shadow,
@@ -281,6 +292,7 @@
 
 			// Create and attach toggle button in header if it doesn't exist
 			if (header && !header?.querySelector(`button.${toggleBtnClass}`)) {
+				setChanged(shadow.host);
 				createToggleButton(header);
 			}
 
@@ -290,6 +302,7 @@
 				existingBtnContainer &&
 				!existingBtnContainer?.querySelector(`button.${toggleBtnClass}`)
 			) {
+				setChanged(shadow.host);
 				createToggleButton(existingBtnContainer);
 			}
 
@@ -309,6 +322,7 @@
 					}
 				}
 
+				setChanged(shadow.host);
 				const showCallback = () => showChatWindow();
 				const hideCallback = () => hideChatWindow();
 
