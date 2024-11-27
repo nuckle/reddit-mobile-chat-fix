@@ -49,6 +49,7 @@ jobs:
       #     filename: 'chrome.zip'
       #     path: 'dist/'
 
+
   changelog:
     name: Changelog
     needs:
