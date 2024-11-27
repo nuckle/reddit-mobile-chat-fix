@@ -71,6 +71,10 @@ jobs:
         run: |
           git checkout -b ${{ env.PR_BRANCH }}
 
+      - name: Set upstream for the branch
+        run: |
+          git branch --set-upstream-to=origin/${{ env.PR_BRANCH }} ${{ env.PR_BRANCH }}
+
       - name: Create Changelog
         uses: TriPSs/conventional-changelog-action@dd734f74fce61a6e02f821ee1b5930bc79a23534 # v5
         id: changelog
