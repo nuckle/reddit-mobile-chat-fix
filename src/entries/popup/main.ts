@@ -1,38 +1,73 @@
-import browser from 'webextension-polyfill';
-import logo from '~/assets/logo.svg';
-import './style.css';
+import browser from "webextension-polyfill";
+import logo from "~/assets/logo.svg";
+import "./style.css";
 
 const imageUrl = new URL(logo, import.meta.url).href;
 
 interface StorageData {
 	enabled: boolean;
+	userAgentSpooferEnabled: boolean;
 }
 
-document.querySelector('#app')!.innerHTML = `
-  <img src="${imageUrl}" height="45" alt="" />
+document.querySelector("#app")!.innerHTML = `
+  <img class="logo" src="${imageUrl}" height="45" alt="" />
   <label>
-    Enable Fix <input type="checkbox" id="toggleExtension" />
+    Extension <input type="checkbox" id="toggleExtension" />
+  </label>
+  <label>
+    User-Agent spoofer <input type="checkbox" id="toggleUserAgent" />
   </label>
 `;
 
-const toggleCheckbox = document.getElementById(
-	'toggleExtension',
+const toggleExtensionCheckbox = document.getElementById(
+	"toggleExtension",
 ) as HTMLInputElement | null;
 
-if (toggleCheckbox) {
+if (toggleExtensionCheckbox) {
 	// Get the 'enabled' setting from storage
 	browser.storage.sync
-		.get('enabled')
+		.get("enabled")
 		.then((data: Partial<StorageData>) => {
-			toggleCheckbox.checked = data.enabled !== undefined ? data.enabled : false;
+			toggleExtensionCheckbox.checked =
+				data.enabled !== undefined ? data.enabled : false;
+			console.log(data);
 		})
 		.catch((error) => {
-			console.error('Error loading the setting:', error);
+			console.error("Error loading the setting:", error);
 		});
 
-	toggleCheckbox.addEventListener('change', () => {
-		if (toggleCheckbox) {
-			browser.storage.sync.set({ enabled: toggleCheckbox.checked });
+	toggleExtensionCheckbox.addEventListener("change", () => {
+		if (toggleExtensionCheckbox) {
+			browser.storage.sync.set({
+				enabled: toggleExtensionCheckbox.checked,
+			});
+		}
+	});
+}
+
+const toggleUserAgentCheckbox = document.getElementById(
+	"toggleUserAgent",
+) as HTMLInputElement | null;
+
+if (toggleUserAgentCheckbox) {
+	// Get the 'userAgentSpooferEnabled' setting from storage
+	browser.storage.sync
+		.get("userAgentSpooferEnabled")
+		.then((data: Partial<StorageData>) => {
+			toggleUserAgentCheckbox.checked =
+				data.userAgentSpooferEnabled !== undefined
+					? data.userAgentSpooferEnabled
+					: false;
+		})
+		.catch((error) => {
+			console.error("Error loading the setting:", error);
+		});
+
+	toggleUserAgentCheckbox.addEventListener("change", () => {
+		if (toggleExtensionCheckbox) {
+			browser.storage.sync.set({
+				userAgentSpooferEnabled: toggleUserAgentCheckbox.checked,
+			});
 		}
 	});
 }

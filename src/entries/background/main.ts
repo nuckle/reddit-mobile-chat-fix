@@ -1,93 +1,149 @@
-import browser from 'webextension-polyfill';
-import { getAppDomain, getUserAgent, isEnabled } from '../../entries/utils';
+import browser from "webextension-polyfill";
+import {
+	getAppDomain,
+	getUserAgent,
+	isEnabled,
+	isUserAgentSpooferEnabled,
+} from "../../entries/utils";
 
 const domain = getAppDomain();
 
 browser.runtime.onInstalled.addListener(() => {
-	console.log('Extension installed');
+	console.log("Extension installed");
 
 	browser.storage.sync
-		.get('enabled')
+		.get("enabled")
 		.then((data) => {
 			if (data.enabled === undefined) {
 				browser.storage.sync.set({ enabled: true });
 			}
 		})
 		.catch((error) => {
-			console.error('Error setting default enabled value:', error);
+			console.error("Error setting default enabled value:", error);
+		});
+
+	browser.storage.sync
+		.get("userAgentSpooferEnabled")
+		.then((data) => {
+			if (data.userAgentSpooferEnabled === undefined) {
+				browser.storage.sync.set({ userAgentSpooferEnabled: true });
+			}
+		})
+		.catch((error) => {
+			console.error(
+				"Error setting default enabled value for user agent spoofing:",
+				error,
+			);
 		});
 });
 
 const userAgent = getUserAgent();
 
-if (chrome?.declarativeNetRequest !== undefined) {
-	function updateRulesBasedOnEnabled() {
-		isEnabled(browser).then((enabled) => {
-			if (enabled) {
-				const rules = {
-					removeRuleIds: [1],
+function chromeNetworkCode() {
+	const RULE_ID = 1;
+
+	function getRules(enabled: boolean) {
+		return enabled
+			? {
+					removeRuleIds: [RULE_ID],
 					addRules: [
 						{
-							id: 1,
+							id: RULE_ID,
 							priority: 1,
 							action: {
-								type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+								type: chrome.declarativeNetRequest
+									.RuleActionType.MODIFY_HEADERS,
 								requestHeaders: [
 									{
-										header: 'user-agent',
-										operation: chrome.declarativeNetRequest.HeaderOperation.SET,
+										header: "user-agent",
+										operation:
+											chrome.declarativeNetRequest
+												.HeaderOperation.SET,
 										value: userAgent,
 									},
 								],
 							},
 							condition: {
-								resourceTypes: [chrome.declarativeNetRequest.ResourceType.MAIN_FRAME],
+								resourceTypes: [
+									chrome.declarativeNetRequest.ResourceType
+										.MAIN_FRAME,
+								],
 								urlFilter: domain,
 							},
 						},
 					],
+				}
+			: {
+					removeRuleIds: [RULE_ID],
 				};
-
-				chrome.declarativeNetRequest.updateDynamicRules(rules);
-			} else {
-				chrome.declarativeNetRequest.updateDynamicRules({
-					removeRuleIds: [1],
-				});
-			}
-		});
 	}
 
-	chrome.runtime.onInstalled.addListener(function () {
-		updateRulesBasedOnEnabled();
+	chrome.runtime.onInstalled.addListener(async function () {
+		const enabled = await isEnabled(browser);
+		const userAgentSpooferEnabled =
+			await isUserAgentSpooferEnabled(browser);
+
+		let rules;
+		if (!enabled || !userAgentSpooferEnabled) {
+			rules = getRules(false);
+		} else {
+			rules = getRules(true);
+		}
+
+		chrome.declarativeNetRequest.updateDynamicRules(rules);
 	});
 
-	chrome.storage.onChanged.addListener(function (changes, areaName) {
-		if (areaName === 'sync' && changes.hasOwnProperty('enabled')) {
-			updateRulesBasedOnEnabled();
+	chrome.storage.onChanged.addListener(async function (changes, areaName) {
+		if (
+			areaName === "sync" &&
+			(changes.hasOwnProperty("enabled") ||
+				changes.hasOwnProperty("userAgentSpooferEnabled"))
+		) {
+			const enabled = await isEnabled(browser);
+			const userAgentSpooferEnabled =
+				await isUserAgentSpooferEnabled(browser);
+
+			let rules;
+			if (!enabled || !userAgentSpooferEnabled) {
+				rules = getRules(false);
+			} else {
+				rules = getRules(true);
+			}
+
+			chrome.declarativeNetRequest.updateDynamicRules(rules);
 		}
 	});
-} else {
+}
+
+function firefoxNetworkCode() {
 	browser.webRequest.onBeforeSendHeaders.addListener(
-		function (info) {
-			return isEnabled(browser).then((enabled) => {
-				if (enabled) {
-					const headers = info.requestHeaders;
-					if (headers) {
-						headers.forEach(function (header) {
-							if (header.name.toLowerCase() === 'user-agent') {
-								header.value = userAgent;
-							}
-						});
-					}
-					return { requestHeaders: headers };
-				}
+		async function (info) {
+			const enabled = await isEnabled(browser);
+			const userAgentSpooferEnabled =
+				await isUserAgentSpooferEnabled(browser);
+
+			if (!enabled || !userAgentSpooferEnabled) {
 				return { requestHeaders: info.requestHeaders };
+			}
+			const headers = info.requestHeaders?.map((header) => {
+				if (header.name.toLowerCase() === "user-agent") {
+					return { ...header, value: userAgent };
+				}
+				return header;
 			});
+
+			return { requestHeaders: headers };
 		},
 		{
 			urls: [domain],
-			types: ['main_frame', 'sub_frame'],
+			types: ["main_frame", "sub_frame"],
 		},
-		['blocking', 'requestHeaders'],
+		["blocking", "requestHeaders"],
 	);
+}
+
+if (chrome?.declarativeNetRequest !== undefined) {
+	chromeNetworkCode();
+} else {
+	firefoxNetworkCode();
 }

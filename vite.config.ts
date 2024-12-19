@@ -10,7 +10,7 @@ export default defineConfig(({ command, mode }) => {
 	return {
 		plugins: [
 			webExtension({
-				manifest: getManifest(Number(env.MANIFEST_VERSION)),
+				manifest: getManifest(Number(env.MANIFEST_VERSION) || 3),
 				additionalInputs: {
 					scripts: ['src/entries/injectChat.js'],
 				},
