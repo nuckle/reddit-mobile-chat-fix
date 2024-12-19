@@ -1,39 +1,60 @@
-import logo from '~/assets/logo.svg';
-import './style.css';
-import browser from 'webextension-polyfill';
+import {
+	isEnabled,
+	isUserAgentSpooferEnabled,
+	setEnabled,
+	setUserAgentSpooferEnabled,
+} from "../utils";
+import "./style.css";
 
-interface StorageData {
-	enabled: boolean;
-}
-
-const imageUrl = new URL(logo, import.meta.url).href;
-
-document.querySelector('#app')!.innerHTML = `
-  <img src="${imageUrl}" height="45" alt="" />
-  <label>
-    Enable Fix <input type="checkbox" id="toggleExtensionOption" /> 
-  </label>
+document.querySelector("#app")!.innerHTML = `
+  <h1>Extension Settings</h1>
+  <div class="settings">
+    <label>
+      <input type="checkbox" id="toggleExtensionOption" />
+      Enable Fix
+    </label>
+    <label>
+      <input type="checkbox" id="toggleUserAgent" />
+      User-Agent Spoofer
+    </label>
+  </div>
 `;
 
-const toggleCheckbox = document.getElementById(
-	'toggleExtensionOption',
+const toggleExtensionCheckbox = document.getElementById(
+	"toggleExtension",
 ) as HTMLInputElement | null;
 
-if (toggleCheckbox) {
-	// Get the 'enabled' setting from storage
-	browser.storage.sync
-		.get('enabled')
-		.then((data: Partial<StorageData>) => {
-			const enabled = data.enabled;
-			toggleCheckbox.checked = enabled !== undefined ? enabled : false;
-		})
-		.catch((error) => {
-			console.error('Error loading the setting:', error);
-		});
+if (toggleExtensionCheckbox) {
+	try {
+		const enabled = await isEnabled();
+		toggleExtensionCheckbox.checked = enabled !== null ? enabled : false;
+	} catch (error) {
+		console.error("Error loading the setting:", error);
+	}
 
-	toggleCheckbox.addEventListener('change', () => {
-		if (toggleCheckbox) {
-			browser.storage.sync.set({ enabled: toggleCheckbox.checked });
+	toggleExtensionCheckbox.addEventListener("change", async () => {
+		if (toggleExtensionCheckbox) {
+			await setEnabled(toggleExtensionCheckbox.checked);
+		}
+	});
+}
+
+const toggleUserAgentCheckbox = document.getElementById(
+	"toggleUserAgent",
+) as HTMLInputElement | null;
+
+if (toggleUserAgentCheckbox) {
+	try {
+		const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
+		toggleUserAgentCheckbox.checked =
+			userAgentSpooferEnabled !== null ? userAgentSpooferEnabled : false;
+	} catch (error) {
+		console.error("Error loading the setting:", error);
+	}
+
+	toggleUserAgentCheckbox.addEventListener("change", async () => {
+		if (toggleExtensionCheckbox) {
+			await setUserAgentSpooferEnabled(toggleUserAgentCheckbox.checked);
 		}
 	});
 }

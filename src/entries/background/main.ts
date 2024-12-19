@@ -1,40 +1,38 @@
 import browser from "webextension-polyfill";
 import {
-	getAppDomain,
-	getUserAgent,
-	isEnabled,
-	isUserAgentSpooferEnabled,
+    getAppDomain,
+    getUserAgent,
+    isEnabled,
+    isUserAgentSpooferEnabled,
+    setEnabled,
+    setUserAgentSpooferEnabled,
 } from "../../entries/utils";
 
 const domain = getAppDomain();
 
-browser.runtime.onInstalled.addListener(() => {
+browser.runtime.onInstalled.addListener(async () => {
 	console.log("Extension installed");
 
-	browser.storage.sync
-		.get("enabled")
-		.then((data) => {
-			if (data.enabled === undefined) {
-				browser.storage.sync.set({ enabled: true });
-			}
-		})
-		.catch((error) => {
-			console.error("Error setting default enabled value:", error);
-		});
+	try {
+		const enabled = await isEnabled();
 
-	browser.storage.sync
-		.get("userAgentSpooferEnabled")
-		.then((data) => {
-			if (data.userAgentSpooferEnabled === undefined) {
-				browser.storage.sync.set({ userAgentSpooferEnabled: true });
-			}
-		})
-		.catch((error) => {
-			console.error(
-				"Error setting default enabled value for user agent spoofing:",
-				error,
-			);
-		});
+		if (enabled === null) {
+			await setEnabled(true);
+		}
+	} catch (error) {
+		console.error("Error setting default storage data value for enabled:", error);
+	}
+
+	try {
+		const userAgentSpooferEnabled =
+			await isUserAgentSpooferEnabled();
+
+		if (userAgentSpooferEnabled === null) {
+			await setUserAgentSpooferEnabled(true);
+		}
+	} catch (error) {
+		console.error("Error setting default storage data value for userAgentSpooferEnabled:", error);
+	}
 });
 
 const userAgent = getUserAgent();
@@ -79,9 +77,9 @@ function chromeNetworkCode() {
 	}
 
 	chrome.runtime.onInstalled.addListener(async function () {
-		const enabled = await isEnabled(browser);
+		const enabled = await isEnabled();
 		const userAgentSpooferEnabled =
-			await isUserAgentSpooferEnabled(browser);
+			await isUserAgentSpooferEnabled();
 
 		let rules;
 		if (!enabled || !userAgentSpooferEnabled) {
@@ -99,9 +97,9 @@ function chromeNetworkCode() {
 			(changes.hasOwnProperty("enabled") ||
 				changes.hasOwnProperty("userAgentSpooferEnabled"))
 		) {
-			const enabled = await isEnabled(browser);
+			const enabled = await isEnabled();
 			const userAgentSpooferEnabled =
-				await isUserAgentSpooferEnabled(browser);
+				await isUserAgentSpooferEnabled();
 
 			let rules;
 			if (!enabled || !userAgentSpooferEnabled) {
@@ -118,9 +116,9 @@ function chromeNetworkCode() {
 function firefoxNetworkCode() {
 	browser.webRequest.onBeforeSendHeaders.addListener(
 		async function (info) {
-			const enabled = await isEnabled(browser);
+			const enabled = await isEnabled();
 			const userAgentSpooferEnabled =
-				await isUserAgentSpooferEnabled(browser);
+				await isUserAgentSpooferEnabled();
 
 			if (!enabled || !userAgentSpooferEnabled) {
 				return { requestHeaders: info.requestHeaders };

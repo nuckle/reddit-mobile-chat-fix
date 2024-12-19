@@ -1,4 +1,4 @@
-import browser, { Browser } from "webextension-polyfill";
+import browser from "webextension-polyfill";
 import { isEnabled } from "~/entries/utils";
 import "./style.css";
 
@@ -11,11 +11,11 @@ function injectScript() {
 	}
 }
 
-async function checkAndInjectScript(browser: Browser) {
-	const enabled = await isEnabled(browser);
+async function checkAndInjectScript() {
+	const enabled = await isEnabled();
 	if (enabled) {
 		injectScript();
 	}
 }
 
-await checkAndInjectScript(browser);
+await checkAndInjectScript();
