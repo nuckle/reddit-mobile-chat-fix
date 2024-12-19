@@ -1,15 +1,15 @@
-import logo from "~/assets/logo.svg";
+import logo from '~/assets/logo.svg';
 import {
 	isEnabled,
 	isUserAgentSpooferEnabled,
 	setEnabled,
 	setUserAgentSpooferEnabled,
-} from "../utils";
-import "./style.css";
+} from '../utils';
+import './style.css';
 
 const imageUrl = new URL(logo, import.meta.url).href;
 
-document.querySelector("#app")!.innerHTML = `
+document.querySelector('#app')!.innerHTML = `
   <img class="logo" src="${imageUrl}" height="45" alt="" />
   <label>
     Extension <input type="checkbox" id="toggleExtension" />
@@ -20,7 +20,7 @@ document.querySelector("#app")!.innerHTML = `
 `;
 
 const toggleExtensionCheckbox = document.getElementById(
-	"toggleExtension",
+	'toggleExtension',
 ) as HTMLInputElement | null;
 
 if (toggleExtensionCheckbox) {
@@ -28,10 +28,10 @@ if (toggleExtensionCheckbox) {
 		const enabled = await isEnabled();
 		toggleExtensionCheckbox.checked = enabled !== null ? enabled : false;
 	} catch (error) {
-		console.error("Error loading the setting:", error);
+		console.error('Error loading the setting:', error);
 	}
 
-	toggleExtensionCheckbox.addEventListener("change", async () => {
+	toggleExtensionCheckbox.addEventListener('change', async () => {
 		if (toggleExtensionCheckbox) {
 			await setEnabled(toggleExtensionCheckbox.checked);
 		}
@@ -39,7 +39,7 @@ if (toggleExtensionCheckbox) {
 }
 
 const toggleUserAgentCheckbox = document.getElementById(
-	"toggleUserAgent",
+	'toggleUserAgent',
 ) as HTMLInputElement | null;
 
 if (toggleUserAgentCheckbox) {
@@ -48,10 +48,10 @@ if (toggleUserAgentCheckbox) {
 		toggleUserAgentCheckbox.checked =
 			userAgentSpooferEnabled !== null ? userAgentSpooferEnabled : false;
 	} catch (error) {
-		console.error("Error loading the setting:", error);
+		console.error('Error loading the setting:', error);
 	}
 
-	toggleUserAgentCheckbox.addEventListener("change", async () => {
+	toggleUserAgentCheckbox.addEventListener('change', async () => {
 		if (toggleExtensionCheckbox) {
 			await setUserAgentSpooferEnabled(toggleUserAgentCheckbox.checked);
 		}

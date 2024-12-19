@@ -1,17 +1,17 @@
-import browser from "webextension-polyfill";
+import browser from 'webextension-polyfill';
 import {
-    getAppDomain,
-    getUserAgent,
-    isEnabled,
-    isUserAgentSpooferEnabled,
-    setEnabled,
-    setUserAgentSpooferEnabled,
-} from "../../entries/utils";
+	getAppDomain,
+	getUserAgent,
+	isEnabled,
+	isUserAgentSpooferEnabled,
+	setEnabled,
+	setUserAgentSpooferEnabled,
+} from '../../entries/utils';
 
 const domain = getAppDomain();
 
 browser.runtime.onInstalled.addListener(async () => {
-	console.log("Extension installed");
+	console.log('Extension installed');
 
 	try {
 		const enabled = await isEnabled();
@@ -20,18 +20,23 @@ browser.runtime.onInstalled.addListener(async () => {
 			await setEnabled(true);
 		}
 	} catch (error) {
-		console.error("Error setting default storage data value for enabled:", error);
+		console.error(
+			'Error setting default storage data value for enabled:',
+			error,
+		);
 	}
 
 	try {
-		const userAgentSpooferEnabled =
-			await isUserAgentSpooferEnabled();
+		const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
 
 		if (userAgentSpooferEnabled === null) {
 			await setUserAgentSpooferEnabled(true);
 		}
 	} catch (error) {
-		console.error("Error setting default storage data value for userAgentSpooferEnabled:", error);
+		console.error(
+			'Error setting default storage data value for userAgentSpooferEnabled:',
+			error,
+		);
 	}
 });
 
@@ -53,7 +58,7 @@ function chromeNetworkCode() {
 									.RuleActionType.MODIFY_HEADERS,
 								requestHeaders: [
 									{
-										header: "user-agent",
+										header: 'user-agent',
 										operation:
 											chrome.declarativeNetRequest
 												.HeaderOperation.SET,
@@ -78,8 +83,7 @@ function chromeNetworkCode() {
 
 	chrome.runtime.onInstalled.addListener(async function () {
 		const enabled = await isEnabled();
-		const userAgentSpooferEnabled =
-			await isUserAgentSpooferEnabled();
+		const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
 
 		let rules;
 		if (!enabled || !userAgentSpooferEnabled) {
@@ -93,13 +97,12 @@ function chromeNetworkCode() {
 
 	chrome.storage.onChanged.addListener(async function (changes, areaName) {
 		if (
-			areaName === "sync" &&
-			(changes.hasOwnProperty("enabled") ||
-				changes.hasOwnProperty("userAgentSpooferEnabled"))
+			areaName === 'sync' &&
+			(changes.hasOwnProperty('enabled') ||
+				changes.hasOwnProperty('userAgentSpooferEnabled'))
 		) {
 			const enabled = await isEnabled();
-			const userAgentSpooferEnabled =
-				await isUserAgentSpooferEnabled();
+			const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
 
 			let rules;
 			if (!enabled || !userAgentSpooferEnabled) {
@@ -117,14 +120,13 @@ function firefoxNetworkCode() {
 	browser.webRequest.onBeforeSendHeaders.addListener(
 		async function (info) {
 			const enabled = await isEnabled();
-			const userAgentSpooferEnabled =
-				await isUserAgentSpooferEnabled();
+			const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
 
 			if (!enabled || !userAgentSpooferEnabled) {
 				return { requestHeaders: info.requestHeaders };
 			}
 			const headers = info.requestHeaders?.map((header) => {
-				if (header.name.toLowerCase() === "user-agent") {
+				if (header.name.toLowerCase() === 'user-agent') {
 					return { ...header, value: userAgent };
 				}
 				return header;
@@ -134,9 +136,9 @@ function firefoxNetworkCode() {
 		},
 		{
 			urls: [domain],
-			types: ["main_frame", "sub_frame"],
+			types: ['main_frame', 'sub_frame'],
 		},
-		["blocking", "requestHeaders"],
+		['blocking', 'requestHeaders'],
 	);
 }
 
