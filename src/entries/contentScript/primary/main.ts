@@ -11,11 +11,16 @@ function injectScript() {
 	}
 }
 
-async function checkAndInjectScript() {
-	const enabled = await isEnabled();
-	if (enabled) {
-		injectScript();
-	}
+function checkAndInjectScript() {
+	isEnabled(browser)
+		.then((enabled) => {
+			if (enabled) {
+				injectScript();
+			}
+		})
+		.catch((error) => {
+			console.error('Error checking or injecting script:', error);
+		});
 }
 
-await checkAndInjectScript();
+checkAndInjectScript();

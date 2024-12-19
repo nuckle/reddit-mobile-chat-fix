@@ -14,10 +14,10 @@ browser.runtime.onInstalled.addListener(async () => {
 	console.log('Extension installed');
 
 	try {
-		const enabled = await isEnabled();
+		const enabled = await isEnabled(browser);
 
 		if (enabled === null) {
-			await setEnabled(true);
+			await setEnabled(browser, true);
 		}
 	} catch (error) {
 		console.error(
@@ -27,10 +27,11 @@ browser.runtime.onInstalled.addListener(async () => {
 	}
 
 	try {
-		const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
+		const userAgentSpooferEnabled =
+			await isUserAgentSpooferEnabled(browser);
 
 		if (userAgentSpooferEnabled === null) {
-			await setUserAgentSpooferEnabled(true);
+			await setUserAgentSpooferEnabled(browser, true);
 		}
 	} catch (error) {
 		console.error(
@@ -82,8 +83,9 @@ function chromeNetworkCode() {
 	}
 
 	chrome.runtime.onInstalled.addListener(async function () {
-		const enabled = await isEnabled();
-		const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
+		const enabled = await isEnabled(browser);
+		const userAgentSpooferEnabled =
+			await isUserAgentSpooferEnabled(browser);
 
 		let rules;
 		if (!enabled || !userAgentSpooferEnabled) {
@@ -101,8 +103,9 @@ function chromeNetworkCode() {
 			(changes.hasOwnProperty('enabled') ||
 				changes.hasOwnProperty('userAgentSpooferEnabled'))
 		) {
-			const enabled = await isEnabled();
-			const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
+			const enabled = await isEnabled(browser);
+			const userAgentSpooferEnabled =
+				await isUserAgentSpooferEnabled(browser);
 
 			let rules;
 			if (!enabled || !userAgentSpooferEnabled) {
@@ -119,8 +122,9 @@ function chromeNetworkCode() {
 function firefoxNetworkCode() {
 	browser.webRequest.onBeforeSendHeaders.addListener(
 		async function (info) {
-			const enabled = await isEnabled();
-			const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
+			const enabled = await isEnabled(browser);
+			const userAgentSpooferEnabled =
+				await isUserAgentSpooferEnabled(browser);
 
 			if (!enabled || !userAgentSpooferEnabled) {
 				return { requestHeaders: info.requestHeaders };
