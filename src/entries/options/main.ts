@@ -10,7 +10,7 @@ document.querySelector("#app")!.innerHTML = `
   <h1>Extension Settings</h1>
   <div class="settings">
     <label>
-      <input type="checkbox" id="toggleExtensionOption" />
+      <input type="checkbox" id="toggleExtension" />
       Enable Fix
     </label>
     <label>
