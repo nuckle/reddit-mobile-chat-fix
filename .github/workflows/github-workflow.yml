@@ -64,13 +64,13 @@ jobs:
         uses: TriPSs/conventional-changelog-action@v6 # angular preset
         id: changelog
         with:
-          github-token: ${{ github.token }}
+          github-token: ${{ secrets.GH_OWNER_TOKEN }}
+          preset: 'angular'
           git-user-name: "github-actions[bot]"
           git-user-email: "github-actions[bot]@users.noreply.github.com"
           git-branch: ${{ env.PR_BRANCH }}
           skip-git-pull: true
           output-file: false
-          skip-bump: true
           version-file: package.json
           create-summary: true
 
@@ -79,7 +79,7 @@ jobs:
         run: |
           gh pr create --base main --head ${{ env.PR_BRANCH }} --title 'chore(release): ${{ steps.changelog.outputs.tag }} [skip-ci]' --body '${{ steps.changelog.outputs.clean_changelog }}'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GH_OWNER_TOKEN }}
 
       - name: Approve Changelog PR
         if: steps.changelog.outputs.skipped == 'false'
