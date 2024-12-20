@@ -8,17 +8,68 @@ import {
 } from '../utils';
 import './style.css';
 
-const imageUrl = new URL(logo, import.meta.url).href;
+interface Setting {
+	id: string;
+	label: string;
+}
 
-document.querySelector('#app')!.innerHTML = `
-  <img class="logo" src="${imageUrl}" height="45" alt="" />
-  <label>
-    Extension <input type="checkbox" id="toggleExtension" />
-  </label>
-  <label>
-    User-Agent spoofer <input type="checkbox" id="toggleUserAgent" />
-  </label>
-`;
+const settings: Setting[] = [
+	{ id: 'toggleExtension', label: 'Reddit Mobile Chat Fix' },
+	{ id: 'toggleUserAgent', label: 'User-Agent Spoofer' },
+];
+
+function createSettingElement(setting: Setting): string {
+	return `
+        <div class="setting-item">
+			<label class="setting-label" for="${setting.id}">${setting.label}</label>
+            <label class="toggle">
+                <input type="checkbox" id="${setting.id}">
+                <span class="slider"></span>
+            </label>
+        </div>
+    `;
+}
+
+function initializePopup() {
+	const app = document.querySelector<HTMLDivElement>('#app')!;
+	const imageUrl = new URL(logo, import.meta.url).href;
+
+	app.innerHTML = `
+        <div class="header">
+            <img src="${imageUrl}" height="57" width="57" alt="Reddit Logo" class="logo">
+			<h1>Mobile Chat Fix</h1>
+        </div>
+        <div class="settings">
+            ${settings.map(createSettingElement).join('')}
+        </div>
+        <div class="footer">
+            Enhance your Reddit experience
+        </div>
+    `;
+
+	settings.forEach((setting) => {
+		const checkbox = document.querySelector<HTMLInputElement>(
+			`#${setting.id}`,
+		);
+		if (checkbox) {
+			// Load saved state
+			chrome.storage.sync.get(setting.id, (result) => {
+				checkbox.checked = result[setting.id] || false;
+			});
+
+			checkbox.addEventListener('change', (event) => {
+				const target = event.target as HTMLInputElement;
+				// Save state
+				chrome.storage.sync.set({ [setting.id]: target.checked });
+				console.log(
+					`${setting.label} is now ${target.checked ? 'enabled' : 'disabled'}`,
+				);
+			});
+		}
+	});
+}
+
+initializePopup();
 
 const toggleExtensionCheckbox = document.getElementById(
 	'toggleExtension',
