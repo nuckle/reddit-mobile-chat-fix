@@ -65,12 +65,12 @@ jobs:
         id: changelog
         with:
           github-token: ${{ github.token }}
+          preset: 'angular'
           git-user-name: "github-actions[bot]"
           git-user-email: "github-actions[bot]@users.noreply.github.com"
           git-branch: ${{ env.PR_BRANCH }}
           skip-git-pull: true
           output-file: false
-          skip-bump: true
           version-file: package.json
           create-summary: true
 
