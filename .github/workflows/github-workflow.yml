@@ -61,7 +61,7 @@ jobs:
           git checkout -b ${{ env.PR_BRANCH }}
 
       - name: Create Changelog
-        uses: TriPSs/conventional-changelog-action@dd734f74fce61a6e02f821ee1b5930bc79a23534 # v5
+        uses: TriPSs/conventional-changelog-action@dd734f74fce61a6e02f821ee1b5930bc79a23534 # v5, angular preset
         id: changelog
         with:
           github-token: ${{ github.token }}
@@ -70,6 +70,7 @@ jobs:
           git-branch: ${{ env.PR_BRANCH }}
           skip-git-pull: true
           output-file: false
+          skip-bump: true
           version-file: package.json
           create-summary: true
 
