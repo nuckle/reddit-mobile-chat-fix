@@ -12,12 +12,13 @@ on mobile!
 <details>
   <summary>Without the extension</summary>
   <img src="img/1.png" alt="Without the extension">
+  <img src="img/2.png" alt="Without the extension">
 </details>
 
 <details>
   <summary>With the extension</summary>
-  <img src="img/2.png" alt="With the extension">
   <img src="img/3.png" alt="With the extension">
+  <img src="img/4.png" alt="With the extension">
 </details>
 
 ## Download
