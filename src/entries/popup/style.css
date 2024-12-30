@@ -1,5 +1,5 @@
 body {
-	width: 250px;
+	width: 100%;
 	margin: 0;
 	font-family: 'IBM Plex Sans', 'Noto Sans', 'Roboto', sans-serif;
 	background-color: #dae0e6;
@@ -11,6 +11,9 @@ body {
 	background-color: #ffffff;
 	border-radius: 4px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	max-width: 90vw;
+	min-width: 250px;
+	margin: 0 auto;
 }
 
 .header {
@@ -26,7 +29,7 @@ body {
 }
 
 h1 {
-	font-size: 18px;
+	font-size: 1.4rem;
 	font-weight: 500;
 	margin: 0;
 }
@@ -41,7 +44,7 @@ h1 {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	font-size: 14px;
+	font-size: .9rem;
 }
 
 .setting-label {
@@ -96,6 +99,6 @@ input:checked + .slider:before {
 .footer {
 	margin-top: 12px;
 	text-align: center;
-	font-size: 12px;
+	font-size: .7rem;
 	color: #7c7c7c;
 }
