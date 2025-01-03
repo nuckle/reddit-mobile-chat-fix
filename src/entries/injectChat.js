@@ -131,6 +131,7 @@
 	const containerVisibleClass = "container--navbar-visible";
 	const containerHiddenClass = "container--navbar-hidden";
 	const toggleBtnClass = "custom-js-hide-button";
+	const toggleBtnStyleClasses = ["button", "button-primary", "button-x-smal", "px-sm", "font-semibold"];
 	const hiddenElClass = "hidden";
 	const toggleBtnText = "Toggle";
 
@@ -209,7 +210,7 @@
 		const createToggleButton = (parentElement) => {
 			const button = document.createElement("button");
 			button.textContent = toggleBtnText;
-			button.classList.add(toggleBtnClass);
+			button.classList.add(toggleBtnClass, ...toggleBtnStyleClasses);
 			updateEventListener(button, "click", toggleChatWindow);
 			parentElement.appendChild(button);
 			createCustomDesktopStyleClass(
