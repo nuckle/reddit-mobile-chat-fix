@@ -71,6 +71,10 @@
 		listeners.get(element).push({ eventType, callback });
 	}
 
+	function changeUrlPath(url) {
+		window.history.replaceState(null, '', url);
+	}
+
 	function adjustTextareaHeight(textarea) {
 		setTimeout(function () {
 			textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
@@ -132,6 +136,8 @@
 
 	let existingMainContainer = null;
 
+	let originalUrl = '';
+
 	// A function to track if shadowRoot was changed
 	// (we don't want to delete changed shadowRoots)
 	function setChanged(shadowRootHost) {
@@ -165,6 +171,13 @@
 						containerVisibleClass,
 						!isVisible,
 					);
+
+					if (!isVisible) {
+						originalUrl = window.location.href;
+						changeUrlPath('/');
+					} else {
+						changeUrlPath(originalUrl);
+					}
 				}
 			}
 		};
