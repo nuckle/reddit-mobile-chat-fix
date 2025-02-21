@@ -23,10 +23,11 @@ on mobile!
 
 ## Download
 
-|Firefox|
-|---    |
-|<p align="center"><a href="https://addons.mozilla.org/en-US/firefox/addon/reddit-mobile-chat-fix/" ><img src="img/firefox.png"></a></p>|<p align="center">|
-|[Download](https://addons.mozilla.org/en-US/firefox/addon/reddit-mobile-chat-fix/)|
+| Firefox | Chrome |
+|---------|--------|
+| <p align="center"><a href="https://addons.mozilla.org/en-US/firefox/addon/reddit-mobile-chat-fix/"><img src="img/firefox.png"></a></p> | <p align="center"><a href="https://chromewebstore.google.com/detail/reddit-mobile-chat-fix/jbjedfodniecglfmkmpapajikdacieeo"><img src="img/chrome.png"></a></p> |
+| [Download](https://addons.mozilla.org/en-US/firefox/addon/reddit-mobile-chat-fix/) | [Download](https://chromewebstore.google.com/detail/reddit-mobile-chat-fix/jbjedfodniecglfmkmpapajikdacieeo) |
+
 
 Or on a [release page](https://github.com/nuckle/reddit-chat-mobile-fix/releases/latest)
 
