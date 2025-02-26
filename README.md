@@ -38,6 +38,13 @@ Or on a [release page](https://github.com/nuckle/reddit-chat-mobile-fix/releases
 - Built-in user-agent spoofer
 - Basic chat functionality support
 
+## Permissions
+
+- `scripting`: For JavaScript code injection. Also Reddit chat uses shadow DOM and React a lot, so injection is the only option in this case
+- `storage`: To store user settings 
+- `declarativeNetRequest`: Used in ManifestV3 for creating network rules (user-agent spoofer)
+- `webRequest`, `webRequestBlocking`: Used in ManifestV2 for user-agent spoofing
+
 ## Usage Notes
 
 The extension manifest is defined in `src/manifest.js` and used by
