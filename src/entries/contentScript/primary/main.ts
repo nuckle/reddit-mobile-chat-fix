@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { isEnabled } from '~/entries/utils';
+import { isEnabled } from '~/entries/lib/browser/utils';
 import './style.css';
 
 function injectScript() {
@@ -12,7 +12,7 @@ function injectScript() {
 }
 
 function checkAndInjectScript() {
-	isEnabled(browser)
+	isEnabled()
 		.then((enabled) => {
 			if (enabled) {
 				injectScript();

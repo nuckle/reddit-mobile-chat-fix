@@ -1,11 +1,10 @@
-import browser from 'webextension-polyfill';
 import logo from '~/assets/logo.svg';
 import {
 	isEnabled,
 	isUserAgentSpooferEnabled,
 	setEnabled,
 	setUserAgentSpooferEnabled,
-} from '../utils';
+} from '../lib/browser/utils';
 import './style.css';
 
 interface Setting {
@@ -76,7 +75,7 @@ const toggleExtensionCheckbox = document.getElementById(
 ) as HTMLInputElement | null;
 
 if (toggleExtensionCheckbox) {
-	isEnabled(browser)
+	isEnabled()
 		.then((enabled) => {
 			toggleExtensionCheckbox.checked =
 				enabled !== null ? enabled : false;
@@ -87,11 +86,9 @@ if (toggleExtensionCheckbox) {
 
 	toggleExtensionCheckbox.addEventListener('change', () => {
 		if (toggleExtensionCheckbox) {
-			setEnabled(browser, toggleExtensionCheckbox.checked).catch(
-				(error) => {
-					console.error('Error setting the value:', error);
-				},
-			);
+			setEnabled(toggleExtensionCheckbox.checked).catch((error) => {
+				console.error('Error setting the value:', error);
+			});
 		}
 	});
 }
@@ -101,7 +98,7 @@ const toggleUserAgentCheckbox = document.getElementById(
 ) as HTMLInputElement | null;
 
 if (toggleUserAgentCheckbox) {
-	isUserAgentSpooferEnabled(browser)
+	isUserAgentSpooferEnabled()
 		.then((userAgentSpooferEnabled) => {
 			toggleUserAgentCheckbox.checked =
 				userAgentSpooferEnabled !== null
@@ -114,12 +111,11 @@ if (toggleUserAgentCheckbox) {
 
 	toggleUserAgentCheckbox.addEventListener('change', () => {
 		if (toggleUserAgentCheckbox) {
-			setUserAgentSpooferEnabled(
-				browser,
-				toggleUserAgentCheckbox.checked,
-			).catch((error) => {
-				console.error('Error setting the value:', error);
-			});
+			setUserAgentSpooferEnabled(toggleUserAgentCheckbox.checked).catch(
+				(error) => {
+					console.error('Error setting the value:', error);
+				},
+			);
 		}
 	});
 }

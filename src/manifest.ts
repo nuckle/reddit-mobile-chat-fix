@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 import pkg from '../package.json';
-import { getAppDomain } from './entries/utils';
+import { getAppDomain } from './entries/lib/utils';
 
 dotenv.config();
 

@@ -1,12 +1,11 @@
 import browser from 'webextension-polyfill';
+import { getAppDomain, getUserAgent } from '../../entries/lib/utils';
 import {
-	getAppDomain,
-	getUserAgent,
 	isEnabled,
 	isUserAgentSpooferEnabled,
 	setEnabled,
 	setUserAgentSpooferEnabled,
-} from '../../entries/utils';
+} from '../../entries/lib/browser/utils';
 
 const domain = getAppDomain();
 
@@ -14,10 +13,10 @@ browser.runtime.onInstalled.addListener(async () => {
 	console.log('Extension installed');
 
 	try {
-		const enabled = await isEnabled(browser);
+		const enabled = await isEnabled();
 
 		if (enabled === null) {
-			await setEnabled(browser, true);
+			await setEnabled(true);
 		}
 	} catch (error) {
 		console.error(
@@ -27,11 +26,10 @@ browser.runtime.onInstalled.addListener(async () => {
 	}
 
 	try {
-		const userAgentSpooferEnabled =
-			await isUserAgentSpooferEnabled(browser);
+		const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
 
 		if (userAgentSpooferEnabled === null) {
-			await setUserAgentSpooferEnabled(browser, true);
+			await setUserAgentSpooferEnabled(true);
 		}
 	} catch (error) {
 		console.error(
@@ -83,9 +81,8 @@ function chromeNetworkCode() {
 	}
 
 	chrome.runtime.onInstalled.addListener(async function () {
-		const enabled = await isEnabled(browser);
-		const userAgentSpooferEnabled =
-			await isUserAgentSpooferEnabled(browser);
+		const enabled = await isEnabled();
+		const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
 
 		let rules;
 		if (!enabled || !userAgentSpooferEnabled) {
@@ -103,9 +100,8 @@ function chromeNetworkCode() {
 			(changes.hasOwnProperty('enabled') ||
 				changes.hasOwnProperty('userAgentSpooferEnabled'))
 		) {
-			const enabled = await isEnabled(browser);
-			const userAgentSpooferEnabled =
-				await isUserAgentSpooferEnabled(browser);
+			const enabled = await isEnabled();
+			const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
 
 			let rules;
 			if (!enabled || !userAgentSpooferEnabled) {
@@ -122,9 +118,8 @@ function chromeNetworkCode() {
 function firefoxNetworkCode() {
 	browser.webRequest.onBeforeSendHeaders.addListener(
 		async function (info) {
-			const enabled = await isEnabled(browser);
-			const userAgentSpooferEnabled =
-				await isUserAgentSpooferEnabled(browser);
+			const enabled = await isEnabled();
+			const userAgentSpooferEnabled = await isUserAgentSpooferEnabled();
 
 			if (!enabled || !userAgentSpooferEnabled) {
 				return { requestHeaders: info.requestHeaders };
