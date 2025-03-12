@@ -37,6 +37,8 @@ browser.runtime.onInstalled.addListener(async () => {
 			error,
 		);
 	}
+
+	init();
 });
 
 const userAgent = getUserAgent();
@@ -141,8 +143,12 @@ function firefoxNetworkCode() {
 	);
 }
 
-if (chrome?.declarativeNetRequest !== undefined) {
-	chromeNetworkCode();
-} else {
-	firefoxNetworkCode();
+function init() {
+	if (chrome?.declarativeNetRequest !== undefined) {
+		chromeNetworkCode();
+	} else {
+		firefoxNetworkCode();
+	}
 }
+
+init();
