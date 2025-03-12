@@ -1,7 +1,7 @@
 # Reddit Mobile Chat Fix
 
 > [!NOTE]
-> Reddit has suddenly updated the chat for mobile browser. So, you no longer need the extension 😁
+> Reddit has suddenly updated the chat for mobile browsers. While I personally find it slower compared to my extension, you may no longer need it 😁
 
 Just a glorified version of
 [my user script](https://gist.github.com/nuckle/92100273f64a8d18d0010082fff0b587)
