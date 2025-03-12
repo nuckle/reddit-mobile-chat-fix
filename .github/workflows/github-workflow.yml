@@ -119,7 +119,7 @@ jobs:
         with:
           type: 'zip'
           filename: 'firefox.zip'
-          path: 'dist/'
+          path: 'dist/*'
 
       - name: Build ${{ env.APP_NAME }} for Chrome
         run: npm run build:chrome
@@ -128,7 +128,7 @@ jobs:
         with:
           type: 'zip'
           filename: 'chrome.zip'
-          path: 'dist/'
+          path: 'dist/*'
 
       - name: Upload Release
         uses: ncipollo/release-action@v1.12.0
