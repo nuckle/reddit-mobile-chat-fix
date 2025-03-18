@@ -133,7 +133,7 @@ jobs:
       - name: Upload Release
         uses: ncipollo/release-action@v1.12.0
         with:
-          artifacts: "firefox.zip,chrome.zip"
+          artifacts: "dist/firefox.zip,dist/chrome.zip"
           token: ${{ secrets.GH_OWNER_TOKEN }}
           generateReleaseNotes: true
           draft: false
