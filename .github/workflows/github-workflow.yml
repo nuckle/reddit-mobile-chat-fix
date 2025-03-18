@@ -130,10 +130,16 @@ jobs:
           filename: 'chrome.zip'
           directory: 'dist/'
 
+      - name: List contents of dist directory 
+        run: ls -l dist
+
+      - name: List contents of dist directory 
+        run: ls -l 
+
       - name: Upload Release
         uses: ncipollo/release-action@v1.12.0
         with:
-          artifacts: "dist/firefox.zip,dist/chrome.zip"
+          artifacts: "firefox.zip,chrome.zip"
           token: ${{ secrets.GH_OWNER_TOKEN }}
           generateReleaseNotes: true
           draft: false
