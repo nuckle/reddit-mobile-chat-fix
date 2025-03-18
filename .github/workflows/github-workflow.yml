@@ -118,7 +118,7 @@ jobs:
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: 'zip'
-          filename: 'firefox.zip'
+          filename: '../firefox.zip'
           directory: 'dist/'
 
       - name: Build ${{ env.APP_NAME }} for Chrome
@@ -127,14 +127,8 @@ jobs:
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: 'zip'
-          filename: 'chrome.zip'
+          filename: '../chrome.zip'
           directory: 'dist/'
-
-      - name: List contents of dist directory 
-        run: ls -l dist
-
-      - name: List contents of dist directory 
-        run: ls -l 
 
       - name: Upload Release
         uses: ncipollo/release-action@v1.12.0
